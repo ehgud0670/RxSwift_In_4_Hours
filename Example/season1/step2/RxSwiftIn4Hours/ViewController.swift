@@ -83,7 +83,10 @@ class ViewController: UITableViewController {
             .disposed(by: disposeBag)
     }
     
+    // IBAction 에서는 메인 스레드가 작동한다.
     @IBAction func exMap3() {
+        // side - effect 하면 어울리는 함수: subscribe, do
+        
         Observable.just("800x600")
             .subscribeOn(ConcurrentDispatchQueueScheduler(qos: .userInteractive))
             .map { $0.replacingOccurrences(of: "x", with: "/") }
@@ -93,11 +96,10 @@ class ViewController: UITableViewController {
             .map { $0! }
             .map { try Data(contentsOf: $0) }
             .map { UIImage(data: $0) }
-            .observeOn(MainScheduler())
+            .observeOn(MainScheduler.instance)
             .subscribe(onNext: { image in
                 self.imageView.image = image
             })
-            
             .disposed(by: disposeBag)
     }
 }
