@@ -9,24 +9,27 @@
 import RxSwift
 import UIKit
 
+// just, from, filter, take, map, flatMap
+
 class ViewController: UITableViewController {
     @IBOutlet var imageView: UIImageView!
     @IBOutlet weak var progressView: UIActivityIndicatorView!
     
     var disposeBag = DisposeBag()
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
     }
-
+    
+    // just는 통째
     @IBAction func exJust1() {
         Observable.just("Hello World")
             .subscribe(onNext: { str in
                 print(str)
-            })
+            }) // can side - effect
             .disposed(by: disposeBag)
     }
-
+    
     @IBAction func exJust2() {
         Observable.just(["Hello", "World"])
             .subscribe(onNext: { arr in
@@ -34,7 +37,8 @@ class ViewController: UITableViewController {
             })
             .disposed(by: disposeBag)
     }
-
+    
+    // from 은 하나씩
     @IBAction func exFrom1() {
         Observable.from(["RxSwift", "In", "4", "Hours"])
             .subscribe(onNext: { str in
@@ -42,7 +46,8 @@ class ViewController: UITableViewController {
             })
             .disposed(by: disposeBag)
     }
-
+    
+    // map 은 메핑: 모나드 패턴
     @IBAction func exMap1() {
         Observable.just("Hello")
             .map { str in "\(str) RxSwift" }
@@ -51,7 +56,8 @@ class ViewController: UITableViewController {
             })
             .disposed(by: disposeBag)
     }
-
+    
+    // map은 매핑
     @IBAction func exMap2() {
         Observable.from(["with", "곰튀김"])
             .map { $0.count }
@@ -60,7 +66,8 @@ class ViewController: UITableViewController {
             })
             .disposed(by: disposeBag)
     }
-
+    
+    // 필터는 말 그대로 필터, 거르기
     @IBAction func exFilter() {
         Observable.from([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
             .filter { $0 % 2 == 0 }
@@ -69,9 +76,10 @@ class ViewController: UITableViewController {
             })
             .disposed(by: disposeBag)
     }
-
+    
     @IBAction func exMap3() {
         Observable.just("800x600")
+            .subscribeOn(ConcurrentDispatchQueueScheduler(qos: .userInteractive))
             .map { $0.replacingOccurrences(of: "x", with: "/") }
             .map { "https://picsum.photos/\($0)/?random" }
             .map { URL(string: $0) }
@@ -79,9 +87,11 @@ class ViewController: UITableViewController {
             .map { $0! }
             .map { try Data(contentsOf: $0) }
             .map { UIImage(data: $0) }
+            .observeOn(MainScheduler())
             .subscribe(onNext: { image in
                 self.imageView.image = image
             })
+            
             .disposed(by: disposeBag)
     }
 }
