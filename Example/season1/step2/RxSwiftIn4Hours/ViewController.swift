@@ -9,7 +9,7 @@
 import RxSwift
 import UIKit
 
-// just, from, filter, take, map, flatMap
+// operators: just, from, filter, take, map, flatMap
 
 class ViewController: UITableViewController {
     @IBOutlet var imageView: UIImageView!
@@ -23,11 +23,17 @@ class ViewController: UITableViewController {
     
     // just는 통째
     @IBAction func exJust1() {
-        Observable.just("Hello World")
+        // stream은 에러가 낫거나 complete 되면 종료된다.
+        Observable.from(["Hello", "World"])
             .subscribe(onNext: { str in
                 print(str)
-            }) // can side - effect
-            .disposed(by: disposeBag)
+            }, onError: { error in
+                print(error.localizedDescription)
+            }, onCompleted: {
+                print("completed")
+            }) {
+                print("good")
+        }.disposed(by: disposeBag)
     }
     
     @IBAction func exJust2() {
@@ -59,7 +65,7 @@ class ViewController: UITableViewController {
     
     // map은 매핑
     @IBAction func exMap2() {
-        Observable.from(["with", "곰튀김"])
+        Observable.from(["with", "곰튀김"]) // 이런 작업들 자체가 바로 Observable stream~
             .map { $0.count }
             .subscribe(onNext: { str in
                 print(str)
