@@ -13,7 +13,8 @@ class RxSwiftViewController: UIViewController {
     // MARK: - Field
 
     var counter: Int = 0
-
+    var disposeBag = DisposeBag()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
@@ -28,11 +29,11 @@ class RxSwiftViewController: UIViewController {
     @IBOutlet var countLabel: UILabel!
 
     // MARK: - IBAction
-
+    
     @IBAction func onLoadImage(_ sender: Any) {
         imageView.image = nil
 
-        _ = rxswiftLoadImage(from: LARGER_IMAGE_URL)
+        let disposable = rxswiftLoadImage(from: LARGER_IMAGE_URL)
             .observeOn(MainScheduler.instance)
             .subscribe({ result in
                 switch result {
@@ -46,10 +47,12 @@ class RxSwiftViewController: UIViewController {
                     break
                 }
             })
+        
+        disposeBag.insert(disposable)
     }
 
     @IBAction func onCancel(_ sender: Any) {
-        // TODO: cancel image loading
+        disposeBag = DisposeBag()
     }
 
     // MARK: - RxSwift
